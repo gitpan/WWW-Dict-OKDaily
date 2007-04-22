@@ -9,7 +9,7 @@ WWW::Dict::OKDaily - OKDaily Web Dictionary Interface
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
@@ -17,16 +17,10 @@ use Class::Field qw'field const';
 use Encode;
 use WWW::Mechanize;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 const dict_url => 'http://www.okdaily.com/cgi-bin/ecdict.cgi';
 
 field ua => -init => 'WWW::Mechanize->new(agent_alias => "Mac Mozilla")';
-
-sub new {
-    my $class = shift;
-    my $self = {};
-    return bless $self, $class;
-}
 
 =head1 SYNOPSIS
 
@@ -48,6 +42,19 @@ This module doesn't export any functions.
 
 =head1 Methods
 
+=head2 new
+
+Object constructor. No arguments are required for this method.
+
+=cut
+
+sub new {
+    my $class = shift;
+    my $self = {};
+    return bless $self, $class;
+}
+
+
 =head2 define
 
 =cut
@@ -59,11 +66,11 @@ sub define {
     my $ua = $self->ua;
     $ua->get($self->dict_url . "?english=$word");
     my $content = $ua->content();
-    push @$def, $self->parse_content( Encode::decode('big5',$ua->content) );
+    push @$def, $self->_parse_content( Encode::decode('big5',$ua->content) );
     return $def;
 }
 
-sub parse_content {
+sub _parse_content {
     my $self = shift;
     my $content = shift;
     $content =~ /Chinese\(Big5\):\s*(.*?)\s*<br>/;
